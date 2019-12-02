@@ -141,9 +141,9 @@ class agent{
         }
         //keep position within map boundaries
         this.position[0]<1 ? this.position[0] = 1 :
-        this.position[0]>lvl1.map.maxCols ? this.position[0] = lvl1.map.maxCols :
+        this.position[0]>lvl1.maxCols ? this.position[0] = lvl1.maxCols :
         this.position[1]<1 ? this.position[1] = 1 :
-        this.position[1]>lvl1.map.maxRows ? this.position[1] = lvl1.map.maxCols : 
+        this.position[1]>lvl1.maxRows ? this.position[1] = lvl1.maxCols : 
         console.log("moving");
         
 
