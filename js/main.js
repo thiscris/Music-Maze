@@ -1,12 +1,26 @@
 
 
-var so1 = document.getElementById("sound-glory1");
-var so2 = document.getElementById("sound-glory2");
-var so3 = document.getElementById("sound-glory3");
+//Adding sound clips
+function AddSound(id, src) {
+    this.sound = document.createElement("audio");
+    this.sound.setAttribute("id",id);
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.sound.volume = 0;
+    this.sound.loop = true;
+    this.play = function(){
+      this.sound.play();
+    }
+    this.stop = function(){
+      this.sound.pause();
+    }
+    this.play();
+    return sound;
+  } 
 
-so1.loop = true;
-so2.loop = true;
-so3.loop = true;
 
 
 
@@ -61,16 +75,20 @@ class Room {
         this.instruments.push(mp3);
     }
 
+    RemoveInstrument(mp3) {
+        
+    }
+
     PlayInstruments() {
         console.log(this.instruments);
         this.instruments.forEach(function(e){
-            e.play();
+            e.volume = 0.5;
         });
     }
 
     StopInstruments() {
         this.instruments.forEach(function(e){
-            e.pause();
+            e.volume = 0;
         });
     }
 }
@@ -80,6 +98,7 @@ class agent{
     constructor(position,facingDirection){
         this.facingDirection = facingDirection || 3;
         this.position = position || [1,1];
+        this.heldInstrument = "";
     }
 
     Move(newDirection){
@@ -119,23 +138,57 @@ class agent{
 
         console.log(this.facingDirection);
         document.getElementById("posIndicator").innerHTML="You are in: "+this.position[0]+","+this.position[1];
+        this.Listen();
     }
 
     Listen() {
-        console.log(lvl1.map);
+        //console.log(lvl1.map);
         lvl1.map[this.position[0]][this.position[1]].PlayInstruments();
+    }
+
+    PickInstrument(ins){
+        this.heldInstrument = lvl1.map[this.position[0]][this.position[1]].instruments[ins];
+        this.heldInstrument.volume = 1;
+
+        lvl1.map[this.position[0]][this.position[1]].instruments.splice(ins,1);
+
+    }
+
+    DropInstrument(){
+        this.heldInstrument.volume = 0.5;
+        lvl1.map[this.position[0]][this.position[1]].instruments.push(this.heldInstrument);
+        this.heldInstrument = null;
+        
+
     }
     
 }
 
 
+//INITIALIZE
 
-lvl1 = new Level(3,1);
+soA1 = AddSound("glory1","audio/glory1.mp3");
+soA2 = AddSound("glory2","audio/glory2.mp3");
+soA3 = AddSound("glory3","audio/glory3.mp3");
+soB1 = AddSound("popular1","audio/popular1.mp3");
+soB2 = AddSound("popular2","audio/popular2.mp3");
+soB3 = AddSound("popular3","audio/popular3.mp3");
+soC1 = AddSound("shanghai1","audio/shanghai1.mp3");
+soC2 = AddSound("shanghai2","audio/shanghai2.mp3");
+
+
+lvl1 = new Level(3,3);
 //lvl1.AddRoom("A1",[so1,so2,so3]);
 
-lvl1.AddRoom(1,1,[so1]);
-lvl1.AddRoom(2,1,[so2]);
-lvl1.AddRoom(3,1,[so3]);
+lvl1.AddRoom(1,1,[soA1]);
+lvl1.AddRoom(2,1,[soA2]);
+lvl1.AddRoom(3,1,[soA3]);
+lvl1.AddRoom(1,2,[soB1]);
+lvl1.AddRoom(2,2,[soB2]);
+lvl1.AddRoom(3,2,[soB3]);
+lvl1.AddRoom(1,3,[soC1]);
+lvl1.AddRoom(2,3,[soC2]);
+lvl1.AddRoom(3,3,[]);
 
 console.log(lvl1.map);
 

@@ -7,24 +7,18 @@
     <body>
         Game screen here</br>
 
-        <audio src="audio/glory1.mp3" id="sound-glory1"></audio>
-        <audio src="audio/glory2.mp3" id="sound-glory2"></audio>
-        <audio src="audio/glory3.mp3" id="sound-glory3"></audio>
-        <script>
-            var s1 = document.getElementById("sound-glory1");
-            var s2 = document.getElementById("sound-glory2");
-            var s3 = document.getElementById("sound-glory3");
-        </script>
 
         <h1 id="posIndicator">You are in:</h1>
-        <!-- <a href="#" onClick="MIDIjs.play('midi/glory_A_160bpm_dripchord.mid');">Play hinematov.mid</a>
-        <a href="#" onClick="MIDIjs.stop();">Stop MIDI Playback</a> -->
         <a href="#" onClick="NPC.Listen()">Play room sounds</a>
 
         <a href="#" onClick="NPC.Move(0)">Go Forward</a>
         <a href="#" onClick="NPC.Move(-3)">Go Left</a>
         <a href="#" onClick="NPC.Move(3)">Go Right</a>
         <a href="#" onClick="NPC.Move(6)">Go Back</a>
+        </br>
+        <a href="#" onClick="NPC.PickInstrument(0)">Pick Instrument</a>
+        <a href="#" onClick="NPC.DropInstrument()">Drop Instrument</a>
+        
 
 
         <script type='text/javascript' src='js/main.js'></script> 
