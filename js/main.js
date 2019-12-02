@@ -102,7 +102,7 @@ class agent{
     constructor(position,facingDirection){
         this.facingDirection = facingDirection || 3;
         this.position = position || [1,1];
-        this.heldInstrument = "";
+        this.heldInstrument = null;
     }
 
     Move(newDirection){
@@ -158,6 +158,10 @@ class agent{
     }
 
     PickInstrument(ins){
+        if (this.heldInstrument!=null) {
+            console.log("already holding something");
+            return;
+        }
         this.heldInstrument = lvl1.map[this.position[0]][this.position[1]].instruments[ins];
         this.heldInstrument.volume = 1;
 
