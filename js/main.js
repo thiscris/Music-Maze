@@ -1,23 +1,27 @@
 
 
 //Adding sound clips
-function AddSound(id, src) {
+function AddSound(id, src, group) {
     this.sound = document.createElement("audio");
     this.sound.setAttribute("id",id);
     this.sound.src = src;
+    this.sound.class = group;
     this.sound.setAttribute("preload", "auto");
     this.sound.setAttribute("controls", "none");
     this.sound.style.display = "none";
-    document.body.appendChild(this.sound);
     this.sound.volume = 0;
     this.sound.loop = true;
+    document.body.appendChild(this.sound);
     this.play = function(){
       this.sound.play();
     }
     this.stop = function(){
       this.sound.pause();
     }
+
+    //start playing immeadiately
     this.play();
+
     return sound;
   } 
 
@@ -135,6 +139,13 @@ class agent{
                 this.position[1]--;
             break;
         }
+        //keep position within map boundaries
+        position[0]<1 ? position[0] = 1 :
+        position[0]>lvl1.map.maxCols ? position[0] = lvl1.map.maxCols :
+        position[1]<1 ? position[1] = 1 :
+        position[1]>lvl1.map.maxRows ? position[1] = lvl1.map.maxCols : 
+        console.log("moving");
+        
 
         console.log(this.facingDirection);
         document.getElementById("posIndicator").innerHTML="You are in: "+this.position[0]+","+this.position[1];
@@ -159,6 +170,7 @@ class agent{
         lvl1.map[this.position[0]][this.position[1]].instruments.push(this.heldInstrument);
         this.heldInstrument = null;
         
+        //check if all instruments of one group are together
 
     }
     
@@ -167,28 +179,28 @@ class agent{
 
 //INITIALIZE
 
-soA1 = AddSound("glory1","audio/glory1.mp3");
-soA2 = AddSound("glory2","audio/glory2.mp3");
-soA3 = AddSound("glory3","audio/glory3.mp3");
-soB1 = AddSound("popular1","audio/popular1.mp3");
-soB2 = AddSound("popular2","audio/popular2.mp3");
-soB3 = AddSound("popular3","audio/popular3.mp3");
-soC1 = AddSound("shanghai1","audio/shanghai1.mp3");
-soC2 = AddSound("shanghai2","audio/shanghai2.mp3");
+soA1 = AddSound("glory1","audio/glory1.mp3","glory");
+soA2 = AddSound("glory2","audio/glory2.mp3","glory");
+soA3 = AddSound("glory3","audio/glory3.mp3","glory");
+soB1 = AddSound("popular1","audio/popular1.mp3","popular");
+soB2 = AddSound("popular2","audio/popular2.mp3","popular");
+soB3 = AddSound("popular3","audio/popular3.mp3","popular");
+soC1 = AddSound("shanghai1","audio/shanghai1.mp3","shanghai");
+soC2 = AddSound("shanghai2","audio/shanghai2.mp3","shanghai");
 
 
 lvl1 = new Level(3,3);
 //lvl1.AddRoom("A1",[so1,so2,so3]);
 
-lvl1.AddRoom(1,1,[soA1]);
-lvl1.AddRoom(2,1,[soA2]);
-lvl1.AddRoom(3,1,[soA3]);
+lvl1.AddRoom(1,3,[soA1]);
+lvl1.AddRoom(2,3,[soA2]);
+lvl1.AddRoom(3,3,[soA3]);
 lvl1.AddRoom(1,2,[soB1]);
 lvl1.AddRoom(2,2,[soB2]);
 lvl1.AddRoom(3,2,[soB3]);
-lvl1.AddRoom(1,3,[soC1]);
-lvl1.AddRoom(2,3,[soC2]);
-lvl1.AddRoom(3,3,[]);
+lvl1.AddRoom(3,1,[soC1]);
+lvl1.AddRoom(2,1,[soC2]);
+lvl1.AddRoom(1,1,[]);
 
 console.log(lvl1.map);
 
