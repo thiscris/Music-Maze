@@ -181,6 +181,8 @@ class agent{
 }
 
 
+
+
 //INITIALIZE
 
 soA1 = AddSound("glory1","audio/glory1.mp3","glory");
