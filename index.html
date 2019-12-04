@@ -5,17 +5,22 @@
     </head>
     <body>
         <a href="#" onClick="Initialize()">Music Maze</a></br>
+        <h1 id="posIndicator">You are in:</h1>
 
         <div id="game">
-            <h1 id="posIndicator">You are in:</h1>
 
-            <a href="#" onClick="NPC.Move(0)">Go Forward</a></br>
-            <a href="#" onClick="NPC.Move(-3)">Go Left</a></br>
-            <a href="#" onClick="NPC.Move(3)">Go Right</a></br>
-            <a href="#" onClick="NPC.Move(6)">Go Back</a></br>
+            <div   onClick="NPC.PickInstrument(0)">Pick Instrument</div>
+            <div  onClick="NPC.DropInstrument()">Drop Instrument</div>
             </br>
-            <a href="#" onClick="NPC.PickInstrument(0)">Pick Instrument</a>
-            <a href="#" onClick="NPC.DropInstrument()">Drop Instrument</a>
+            
+            <div class="big-button" id="button-up" onClick="interf.PressedButton('UP')"><span>Go Forward</span></div>
+            <div id="mid-buttons-container">
+                <div class="big-button" id="button-left"  onClick="interf.PressedButton('LEFT')"><span>Go Left</span></div>
+                <div class="big-button" id="button-right"  onClick="interf.PressedButton('RIGHT')"><span>Go Right</span></div></br>
+            </div>
+            <div class="big-button" id="button-down"  onClick="interf.PressedButton('DOWN')"><span>Go Back</span></div>
+            
+
         </div>
 
 

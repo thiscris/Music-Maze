@@ -1,3 +1,7 @@
+/*
+    * Settings
+*/
+var interfacemode = "move";
 
 
 //Adding sound clips
@@ -107,6 +111,8 @@ class agent{
 
     Move(newDirection){
 
+        console.log(newDirection);
+
         lvl1.map[this.position[0]][this.position[1]].StopInstruments();
         //update facing direction based on where we want to go
         //left = -3  ; right = +3
@@ -139,12 +145,19 @@ class agent{
                 this.position[1]--;
             break;
         }
+
+        var moved = false;
         //keep position within map boundaries
         this.position[0]<1 ? this.position[0] = 1 :
         this.position[0]>lvl1.maxCols ? this.position[0] = lvl1.maxCols :
         this.position[1]<1 ? this.position[1] = 1 :
         this.position[1]>lvl1.maxRows ? this.position[1] = lvl1.maxCols : 
-        console.log("moving");
+        moved=true;
+
+        //if we didn't move return to original orientation
+        if (!moved) {
+            this.facingDirection = this.facingDirection - newDirection;
+        }
         
 
         console.log(this.facingDirection);
@@ -180,6 +193,23 @@ class agent{
     
 }
 
+class INTERFACE{
+    
+    
+    PressedButton(button) {
+        var dir;
+        if (interfacemode = "move") {
+            button == "UP" ? dir = 0 :
+            button == "DOWN" ? dir = 6 :
+            button == "RIGHT" ? dir = 3 :
+            button == "LEFT" ? dir = -3 :
+            console.log("unknown direction");
+
+            NPC.Move(dir);
+        }
+    }
+}
+
 
 var startingPos = [1,1];
 var NPC = new agent(startingPos,3);
@@ -187,6 +217,8 @@ var NPC = new agent(startingPos,3);
 
 //INITIALIZE
 function Initialize(){
+    interf = new INTERFACE;
+
     soA1 = AddSound("glory1","audio/glory1.mp3","glory");
     soA2 = AddSound("glory2","audio/glory2.mp3","glory");
     soA3 = AddSound("glory3","audio/glory3.mp3","glory");
