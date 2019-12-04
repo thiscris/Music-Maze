@@ -181,6 +181,8 @@ class agent{
 }
 
 
+var startingPos = [1,1];
+var NPC = new agent(startingPos,3);
 
 
 //INITIALIZE
@@ -211,8 +213,6 @@ function Initialize(){
     console.log(lvl1.map);
 
 
-    var startingPos = [1,1];
-    var NPC = new agent(startingPos,3);
     console.log(NPC.position);
     document.getElementById("posIndicator").innerHTML="You are in: "+NPC.position[0]+","+NPC.position[1];
 
