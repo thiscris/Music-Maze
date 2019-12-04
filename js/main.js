@@ -184,34 +184,37 @@ class agent{
 
 
 //INITIALIZE
-
-soA1 = AddSound("glory1","audio/glory1.mp3","glory");
-soA2 = AddSound("glory2","audio/glory2.mp3","glory");
-soA3 = AddSound("glory3","audio/glory3.mp3","glory");
-soB1 = AddSound("popular1","audio/popular1.mp3","popular");
-soB2 = AddSound("popular2","audio/popular2.mp3","popular");
-soB3 = AddSound("popular3","audio/popular3.mp3","popular");
-soC1 = AddSound("shanghai1","audio/shanghai1.mp3","shanghai");
-soC2 = AddSound("shanghai2","audio/shanghai2.mp3","shanghai");
-
-
-lvl1 = new Level(3,3);
-//lvl1.AddRoom("A1",[so1,so2,so3]);
-
-lvl1.AddRoom(1,3,[soA1]);
-lvl1.AddRoom(2,3,[soA2]);
-lvl1.AddRoom(3,3,[soA3]);
-lvl1.AddRoom(1,2,[soB1]);
-lvl1.AddRoom(2,2,[soB2]);
-lvl1.AddRoom(3,2,[soB3]);
-lvl1.AddRoom(3,1,[soC1]);
-lvl1.AddRoom(2,1,[soC2]);
-lvl1.AddRoom(1,1,[]);
-
-console.log(lvl1.map);
+function Initialize(){
+    soA1 = AddSound("glory1","audio/glory1.mp3","glory");
+    soA2 = AddSound("glory2","audio/glory2.mp3","glory");
+    soA3 = AddSound("glory3","audio/glory3.mp3","glory");
+    soB1 = AddSound("popular1","audio/popular1.mp3","popular");
+    soB2 = AddSound("popular2","audio/popular2.mp3","popular");
+    soB3 = AddSound("popular3","audio/popular3.mp3","popular");
+    soC1 = AddSound("shanghai1","audio/shanghai1.mp3","shanghai");
+    soC2 = AddSound("shanghai2","audio/shanghai2.mp3","shanghai");
 
 
-var startingPos = [1,1];
-var NPC = new agent(startingPos,3);
-console.log(NPC.position);
-document.getElementById("posIndicator").innerHTML="You are in: "+NPC.position[0]+","+NPC.position[1];
+    lvl1 = new Level(3,3);
+    //lvl1.AddRoom("A1",[so1,so2,so3]);
+
+    lvl1.AddRoom(1,3,[soA1]);
+    lvl1.AddRoom(2,3,[soA2]);
+    lvl1.AddRoom(3,3,[soA3]);
+    lvl1.AddRoom(1,2,[soB1]);
+    lvl1.AddRoom(2,2,[soB2]);
+    lvl1.AddRoom(3,2,[soB3]);
+    lvl1.AddRoom(3,1,[soC1]);
+    lvl1.AddRoom(2,1,[soC2]);
+    lvl1.AddRoom(1,1,[]);
+
+    console.log(lvl1.map);
+
+
+    var startingPos = [1,1];
+    var NPC = new agent(startingPos,3);
+    console.log(NPC.position);
+    document.getElementById("posIndicator").innerHTML="You are in: "+NPC.position[0]+","+NPC.position[1];
+
+    document.getElementById("game").style.display="block";
+}
