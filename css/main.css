@@ -39,8 +39,14 @@ a {
     height: 33%;
 }
 
-#button-left, #button-right {
-    width: 50%;
+#button-left {
+    width: 42%;
     height: 100%;
     float: inline-start;
+}
+
+#button-right {
+    width: 42%;
+    height: 100%;
+    float: inline-end;
 }
