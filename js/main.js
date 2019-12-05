@@ -61,6 +61,8 @@ class Room {
         this.col = col;
         this.row = row;
 
+        this.visited = false;
+
         //array of mp3 sounds
         this.instruments = instruments;
 
@@ -103,6 +105,37 @@ class agent{
         this.facingDirection = facingDirection || 3;
         this.position = position || [1,1];
         this.heldInstrument = null;
+        this.speech = [];
+        this.speech.Affirmations = [
+            "audio/speech/ok1.mp3",
+            "audio/speech/ok2.mp3",
+            "audio/speech/ok3.mp3",
+            "audio/speech/ok4.mp3",
+            "audio/speech/ok5.mp3"
+        ];
+
+        this.speech.CantGo = [
+            "audio/speech/cantGo1.mp3",
+            "audio/speech/cantGo2.mp3",
+            "audio/speech/cantGo3.mp3",
+            "audio/speech/cantGo4.mp3",
+            "audio/speech/cantGo5.mp3",
+            "audio/speech/cantGo6.mp3"
+        ];
+
+        this.speech.hello = [
+            "audio/speech/hello.mp3"
+        ];
+
+        this.speech.victory = [
+            "audio/speech/victory.mp3"
+        ];
+
+        this.speech.empty = [
+            "audio/speech/nothingHere1.mp3"
+        ];
+
+
     }
 
     ToldTo (action, param) {
@@ -125,27 +158,44 @@ class agent{
     }
 
     Say(phrase,followup) {
+        console.log(this);
+        var c = this.position[0];
+        var r = this.position[1];
 
         followup = followup || console.log("no callback");
 
         switch(phrase){
             case "OK, boss":
-                soSpeech.src = "audio/speech/ok.mp3";
+                soSpeech.src = PickRandom(NPC.speech.Affirmations);
                 soSpeech.play();
             break;
 
             case "Can't go":
-                soSpeech.src = "audio/speech/cantGo.mp3";
+                soSpeech.src = PickRandom(NPC.speech.CantGo);
+                soSpeech.play(); 
+            break;
+
+            case "Empty":
+                soSpeech.src = PickRandom(NPC.speech.empty);
                 soSpeech.play(); 
             break;
 
             case "Victory":
                 console.log("win");
-                soSpeech.src = "audio/speech/victory.mp3";
+                soSpeech.src = PickRandom(NPC.speech.victory);
                 soSpeech.play(); 
             break;
+
+            case "newPlace":
+                if(c==1 && r==1) {
+                    soSpeech.src = PickRandom(NPC.speech.hello);
+                    soSpeech.play(); 
+                }
         }
-        soSpeech.onended(followup());
+        if(followup)  {
+            soSpeech.onended(followup());
+        }
+        
     };
 
     Move(rotate){
@@ -213,7 +263,13 @@ class agent{
     UpdateLocation(){
         console.log(this.facingDirection);
         document.getElementById("posIndicator").innerHTML="You are in: "+this.position[0]+","+this.position[1];
+        
         this.Listen();
+        if(!current_lvl.map[this.position[0],this.position[1]].visited) {
+            NPC.Say("newPlace");
+        }
+
+        current_lvl.map[this.position[0],this.position[1]].visited=true;
         this.ActionDone();
     }
 
@@ -237,7 +293,8 @@ class agent{
             this.heldInstrument =a;
             this.heldInstrument.volume = 1;
         } else {
-            console.log("empty room!");
+            console.log("empty");
+            NPC.Say("empty");
         }
 
         current_lvl.map[this.position[0]][this.position[1]].instruments.splice(ins,1);
@@ -409,7 +466,7 @@ function Initialize(){
     console.log(NPC.position);
     interf.ChangeMode("default");
     document.getElementById("posIndicator").innerHTML="You are in: "+NPC.position[0]+","+NPC.position[1];
-
+    NPC.Say("newPlace");
     document.getElementById("game").style.display="block";
 }
 
@@ -437,5 +494,9 @@ function getUrlParam(parameter, defaultvalue){
         urlparameter = getUrlVars()[parameter];
         }
     return urlparameter;
+}
+
+function PickRandom(array) {
+    return item = array[Math.floor(Math.random()*array.length)];
 }
 
