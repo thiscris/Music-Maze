@@ -262,7 +262,7 @@ class agent{
             console.log(e.class);
             console.log(instr_group_count);
         });
-        instr_group_count==3 ? NPC.Say("Victory",NPC.Victory()) : 0; //Fixed to 3 instruments
+        instr_group_count==4 ? NPC.Say("Victory",NPC.Victory()) : 0; //Fixed to 3 instruments
 
         this.ActionDone();
 
@@ -376,20 +376,21 @@ function Initialize(){
     lvl1.AddRoom(2,1,[so1C2]);
     lvl1.AddRoom(1,1,[]);
 
-    so2B1 = AddSound("glory1","audio/music/glory1.mp3","glory");
-    so2A3 = AddSound("glory1","audio/music/glory1.mp3","glory");
-    so2C1 = AddSound("glory1","audio/music/glory1.mp3","glory");
+    so2B1 = AddSound("glory1","audio/music/love_me_do_1.mp3","loveme");
+    so2A3 = AddSound("glory1","audio/music/love_me_do_2.mp3","loveme");
+    so2D1 = AddSound("glory1","audio/music/love_me_do_3.mp3","loveme");
+    so2C2 = AddSound("glory1","audio/music/love_me_do_4.mp3","loveme");
 
     lvl2 = new Level(4,3);
     lvl2.AddRoom(1,1,[]);
     lvl2.AddRoom(2,1,[so2B1]);
-    lvl2.AddRoom(4,1,[so2C1]);
+    lvl2.AddRoom(4,1,[so2D1]);
     lvl2.AddRoom(1,2,[]);
     lvl2.AddRoom(2,2,[]);
-    lvl2.AddRoom(3,2,[]);
+    lvl2.AddRoom(3,2,[so2C2]);
     lvl2.AddRoom(4,2,[]);
-    lvl2.AddRoom(3,1,[so2C1]);
-    lvl2.AddRoom(3,2,[]);
+    lvl2.AddRoom(1,3,[so2A3]);
+    lvl2.AddRoom(2,3,[]);
     lvl2.AddRoom(4,3,[]);
 
 
