@@ -42,11 +42,11 @@ a {
 #button-left {
     width: 42%;
     height: 100%;
-    float: inline-start;
+    float: left;
 }
 
 #button-right {
     width: 42%;
     height: 100%;
-    float: inline-end;
+    float: right;
 }
