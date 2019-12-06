@@ -377,24 +377,26 @@ class INTERFACE{
                     NPC.ToldTo('Move',-3);
                 break;
             }
-            window.navigator.vibrate(200); 
+            Haptics.vibrate(40); //vibration feedback 
+            
         }
         if (interf.interfacemode=="default"){
             switch(btn) {
                 case "UP":
+                    //alertme();
                     interf.ChangeMode('move');
-                    window.navigator.vibrate(100); //vibration feedback
+                    Haptics.vibrate(40); //vibration feedback
                 break;
                 case "DOWN":
                     
                 break;
                 case "RIGHT":
                     NPC.ToldTo('DropInstrument');
-                    window.navigator.vibrate(100);
+                    Haptics.vibrate(40); //vibration feedback
                 break;
                 case "LEFT":
                     NPC.ToldTo('PickInstrument');
-                    window.navigator.vibrate(100);
+                    Haptics.vibrate(40); //vibration feedback
                 break;
             }
         }
