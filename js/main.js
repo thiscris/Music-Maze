@@ -429,9 +429,9 @@ function Initialize(){
 
     intro = new Level(3,1);
 
-/*
+
     lvl1 = new Level(3,3);
-    lvl1.AddRoom(1,3,[so1A1]);
+/*    lvl1.AddRoom(1,3,[so1A1]);
     lvl1.AddRoom(2,3,[so1A2]);
     lvl1.AddRoom(3,3,[so1A3]);
     lvl1.AddRoom(1,2,[so1B1]);
