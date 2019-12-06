@@ -91,15 +91,18 @@ class Room {
             e.volume = 0.5;
             console.log(e);
         });
-        soBase.volume = 0.3;
+        // this.instruments.length > 0 ? soBase.volume = 0.3 : 0;
     }
 
     StopInstruments() {
+        console.log(NPC.position[0]+" "+NPC.position[1]);
         this.instruments.forEach(function(e){
             e.volume = 0;
         });
-        ("changing soBase.volume to 0");
-        soBase.volume = 0;
+        //changing soBase.volume to 0
+        // soBase.volume = 0;
+        // console.log(soBase.volume);
+
     }
 }
 
@@ -243,7 +246,7 @@ class agent{
 
         var moved = false;
         //if tile is not on the map report that
-        if(!current_lvl.map[newC][newR]){
+        if(current_lvl.map[newC]==undefined || current_lvl.map[newC][newR]===undefined){
             NPC.Say("Can't go",NPC.ActionDone());
             return;
         } 
@@ -254,7 +257,7 @@ class agent{
         this.position[0]=newC;
         this.position[1]=newR;
         this.facingDirection = newDirection;
-        NPC.Say("OK, boss",NPC.Walk);
+        NPC.Say("OK, boss",NPC.Walk());
   
     }     
         
@@ -298,7 +301,7 @@ class agent{
         if( a !== undefined) {
             this.heldInstrument =a;
             this.heldInstrument.volume = 1;
-            soBase.volume = 0.45
+            // soBase.volume = 0.45
         } else {
             console.log("empty");
             NPC.Say("empty");
@@ -311,8 +314,10 @@ class agent{
 
     DropInstrument(){
 
-        console.log(this.heldInstrument);
-        var instr_group = this.heldInstrument.class;
+        console.log(NPC.heldInstrument);
+        if(NPC.heldInstrument === null) return;
+
+        var instr_group = NPC.heldInstrument.class;
         
         this.heldInstrument.volume = 0.5;
         current_lvl.map[this.position[0]][this.position[1]].instruments.push(this.heldInstrument);
@@ -348,48 +353,65 @@ class agent{
 class INTERFACE{
 
     constructor() {
-        this.interfacemode = "move";
+        this.interfacemode = "default";
         this.btnUp = document.getElementById("button-up");
         this.btnDown = document.getElementById("button-down");
         this.btnRight = document.getElementById("button-right");
         this.btnLeft = document.getElementById("button-left");
     }
+
+    ButtonPress(btn){
+        console.log(interf.interfacemode);
+        if(interf.interfacemode=="move"){
+            switch(btn) {
+                case "UP":
+                    NPC.ToldTo('Move',0);
+                break;
+                case "DOWN":
+                    NPC.ToldTo('Move',6);
+                break;
+                case "RIGHT":
+                    NPC.ToldTo('Move',3);
+                break;
+                case "LEFT":
+                    NPC.ToldTo('Move',-3);
+                break;
+            }
+            window.navigator.vibrate(200); 
+        }
+        if (interf.interfacemode=="default"){
+            switch(btn) {
+                case "UP":
+                    interf.ChangeMode('move');
+                    window.navigator.vibrate(100); //vibration feedback
+                break;
+                case "DOWN":
+                    
+                break;
+                case "RIGHT":
+                    NPC.ToldTo('DropInstrument');
+                    window.navigator.vibrate(100);
+                break;
+                case "LEFT":
+                    NPC.ToldTo('PickInstrument');
+                    window.navigator.vibrate(100);
+                break;
+            }
+        }
+    }
     
     ChangeMode(newMode) {
+        interf.interfacemode=newMode;
         switch(newMode){
             case "default" :
-                    //button functions
-                    // add to onClick event Navigator.vibrate();
-                    this.btnUp.setAttribute( "onClick", "interf.ChangeMode('move')");
-                    this.btnDown.setAttribute( "onClick", ""); //empty button
-                    this.btnRight.setAttribute( "onClick", "interf.ChangeMode('talk')");
-                    
-                    //change button based on holding instrument or not
-                    !NPC.heldInstrument ? 
-                        this.btnLeft.setAttribute( "onClick", "NPC.ToldTo('PickInstrument')") :
-                        this.btnLeft.setAttribute( "onClick", "NPC.ToldTo('DropInstrument')") ;
-
-
-                    //button texts
-                    document.getElementById("tUP").innerHTML="Move";
-                    document.getElementById("tDOWN").innerHTML="";
-                    document.getElementById("tRIGHT").innerHTML="Talk";
-
-                    console.log(NPC.heldInstrument );
-                    //change button based on holding instrument or not
-                    !NPC.heldInstrument ? 
-                        document.getElementById("tLEFT").innerHTML="Pick up" :
-                        document.getElementById("tLEFT").innerHTML="Place instrument" ;
-                    
-
+                //button texts
+                document.getElementById("tUP").innerHTML="Move";
+                document.getElementById("tDOWN").innerHTML="";
+                document.getElementById("tRIGHT").innerHTML="Drop instrument";
+                document.getElementById("tLEFT").innerHTML="Pick instrument" ;
             break;
-            case "move" :
-                //button functions
-                this.btnUp.setAttribute( "onClick", " NPC.ToldTo('Move',0)");
-                this.btnDown.setAttribute( "onClick", " NPC.ToldTo('Move',6)");
-                this.btnRight.setAttribute( "onClick", " NPC.ToldTo('Move',3)");
-                this.btnLeft.setAttribute( "onClick", " NPC.ToldTo('Move',-3)");
 
+            case "move" :
                 //button texts
                 document.getElementById("tUP").innerHTML="Go Forward";
                 document.getElementById("tDOWN").innerHTML="Go Back";
@@ -422,30 +444,40 @@ function Initialize(){
     so1B1 = AddSound("popular1","audio/music/popular1.mp3","popular");
     so1B2 = AddSound("popular2","audio/music/popular2.mp3","popular");
     so1B3 = AddSound("popular3","audio/music/popular3.mp3","popular");
+    */
+
+   so1A1 = AddSound("glory1","audio/music/mds1.mp3","glory");
+   so1A2 = AddSound("glory2","audio/music/mds2.mp3","glory");
+   so1A3 = AddSound("glory3","audio/music/mds3.mp3","glory");
+   so1B1 = AddSound("popular1","audio/music/mds4.mp3","popular");
+   so1B2 = AddSound("popular2","audio/music/mds5.mp3","popular");
+   //so1B3 = AddSound("popular3","audio/music/popular3.mp3","popular");
+
     so1C1 = AddSound("shanghai1","audio/music/shanghai1.mp3","shanghai");
     so1C2 = AddSound("shanghai2","audio/music/shanghai2.mp3","shanghai");
-*/
+
 
 
     intro = new Level(3,1);
 
 
     lvl1 = new Level(3,3);
-/*    lvl1.AddRoom(1,3,[so1A1]);
+    lvl1.AddRoom(1,3,[so1A1]);
     lvl1.AddRoom(2,3,[so1A2]);
     lvl1.AddRoom(3,3,[so1A3]);
     lvl1.AddRoom(1,2,[so1B1]);
     lvl1.AddRoom(2,2,[so1B2]);
-    lvl1.AddRoom(3,2,[so1B3]);
+    lvl1.AddRoom(3,2,[]);
+    // lvl1.AddRoom(3,2,[so1B3]);
     lvl1.AddRoom(3,1,[so1C1]);
     lvl1.AddRoom(2,1,[so1C2]);
     lvl1.AddRoom(1,1,[]);
-*/
+
     so2A3 = AddSound("loveme1","audio/music/love_me_do1.mp3","loveme");
     so2B1 = AddSound("loveme2","audio/music/love_me_do2.mp3","loveme");
     so2D1 = AddSound("loveme3","audio/music/love_me_do3.mp3","loveme");
     //so2C2 = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme");
-    soBase = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme");
+    // soBase = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme");
 
     
 
@@ -472,10 +504,10 @@ function Initialize(){
 
     current_lvl = levels[selected_lvl];
 
-    console.log(current_lvl.map);
+    // console.log(current_lvl.map);
 
 
-    console.log(NPC.position);
+    // console.log(NPC.position);
     interf.ChangeMode("default");
     document.getElementById("posIndicator").innerHTML="You are in: "+NPC.position[0]+","+NPC.position[1];
     
