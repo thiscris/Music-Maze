@@ -147,6 +147,7 @@ class agent{
 
     ToldTo (action, param) {
         soNotify.play(); //notification sound
+        interf.acceptInput = false;
         soNotify.onended = function(){
             switch(action) {
                 case "Move":
@@ -248,6 +249,7 @@ class agent{
         //if tile is not on the map report that
         if(current_lvl.map[newC]==undefined || current_lvl.map[newC][newR]===undefined){
             NPC.Say("Can't go",NPC.ActionDone());
+            interf.acceptInput = true;
             return;
         } 
 
@@ -275,11 +277,11 @@ class agent{
         
         this.Listen();
         if(!current_lvl.map[this.position[0],this.position[1]].visited) {
-            NPC.Say("newPlace");
-        }
+            NPC.Say("newPlace",this.ActionDone());
+        } else { 
+            this.ActionDone(); }
 
         current_lvl.map[this.position[0],this.position[1]].visited=true;
-        this.ActionDone();
     }
 
     Listen() {
@@ -341,6 +343,7 @@ class agent{
     ActionDone() {
         //restore default communication buttons
         interf.ChangeMode("default");
+        interf.acceptInput = true;
     }
 
     Victory() {
@@ -358,9 +361,32 @@ class INTERFACE{
         this.btnDown = document.getElementById("button-down");
         this.btnRight = document.getElementById("button-right");
         this.btnLeft = document.getElementById("button-left");
+        this.acceptInput = true;
+
+        document.addEventListener('keydown', logKey);
+    }
+
+    logKey(k) {
+        console.log(e.code);
+        switch(e.code) {
+            case "ArrowUP" || "Digit1":
+                this.ButtonPress("UP");
+            break;
+            case "ArrowDOWN" || "Digit4":
+                this.ButtonPress("DOWN");
+            break;
+            case "ArrowRIGHT" || "Digit3":
+                this.ButtonPress("RIGHT");
+            break;
+            case "ArrowLEFT" || "Digit2":
+                this.ButtonPress("LEFT");
+            break;
+        }
     }
 
     ButtonPress(btn){
+        if(!this.acceptInput) return;
+
         console.log(interf.interfacemode);
         if(interf.interfacemode=="move"){
             switch(btn) {
@@ -514,6 +540,8 @@ function Initialize(){
     document.getElementById("posIndicator").innerHTML="You are in: "+NPC.position[0]+","+NPC.position[1];
     
     document.getElementById("title").style.display="none";
+
+    Haptics.vibrate(100);
 
     NPC.Say("newPlace",document.getElementById("game").style.display="block");
 

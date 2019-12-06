@@ -18,8 +18,13 @@ a {
     background:#3d36;
     margin: auto;
     text-align: center;
-    padding: 30% 0;
+    height: 100%;
 
+}
+
+#title div {
+    position: relative;
+    top: 40%;
 }
 
 
