@@ -13,6 +13,15 @@ a {
 }
 
 
+#title {
+    width: 100%;
+    background:#3d36;
+    margin: auto;
+    text-align: center;
+    padding: 30% 0;
+
+}
+
 
 #game {
     display:none;

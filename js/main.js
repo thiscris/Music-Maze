@@ -89,13 +89,17 @@ class Room {
         console.log(this.instruments);
         this.instruments.forEach(function(e){
             e.volume = 0.5;
+            console.log(e);
         });
+        soBase.volume = 0.3;
     }
 
     StopInstruments() {
         this.instruments.forEach(function(e){
             e.volume = 0;
         });
+        ("changing soBase.volume to 0");
+        soBase.volume = 0;
     }
 }
 
@@ -203,7 +207,6 @@ class agent{
 
         console.log(rotate);
 
-        current_lvl.map[this.position[0]][this.position[1]].StopInstruments();
         //update facing direction based on where we want to go
         //left = -3  ; right = +3
 
@@ -244,6 +247,9 @@ class agent{
             NPC.Say("Can't go",NPC.ActionDone());
             return;
         } 
+
+
+        current_lvl.map[this.position[0]][this.position[1]].StopInstruments();
         
         this.position[0]=newC;
         this.position[1]=newR;
@@ -292,6 +298,7 @@ class agent{
         if( a !== undefined) {
             this.heldInstrument =a;
             this.heldInstrument.volume = 1;
+            soBase.volume = 0.45
         } else {
             console.log("empty");
             NPC.Say("empty");
@@ -352,6 +359,7 @@ class INTERFACE{
         switch(newMode){
             case "default" :
                     //button functions
+                    // add to onClick event Navigator.vibrate();
                     this.btnUp.setAttribute( "onClick", "interf.ChangeMode('move')");
                     this.btnDown.setAttribute( "onClick", ""); //empty button
                     this.btnRight.setAttribute( "onClick", "interf.ChangeMode('talk')");
@@ -407,7 +415,7 @@ function Initialize(){
     soWalk = document.getElementById("walkSound");
     soWalk.loop = true;
     soSpeech = document.getElementById("Speech");
-
+/*
     so1A1 = AddSound("glory1","audio/music/glory1.mp3","glory");
     so1A2 = AddSound("glory2","audio/music/glory2.mp3","glory");
     so1A3 = AddSound("glory3","audio/music/glory3.mp3","glory");
@@ -416,12 +424,12 @@ function Initialize(){
     so1B3 = AddSound("popular3","audio/music/popular3.mp3","popular");
     so1C1 = AddSound("shanghai1","audio/music/shanghai1.mp3","shanghai");
     so1C2 = AddSound("shanghai2","audio/music/shanghai2.mp3","shanghai");
-
+*/
 
 
     intro = new Level(3,1);
 
-
+/*
     lvl1 = new Level(3,3);
     lvl1.AddRoom(1,3,[so1A1]);
     lvl1.AddRoom(2,3,[so1A2]);
@@ -432,11 +440,14 @@ function Initialize(){
     lvl1.AddRoom(3,1,[so1C1]);
     lvl1.AddRoom(2,1,[so1C2]);
     lvl1.AddRoom(1,1,[]);
+*/
+    so2A3 = AddSound("loveme1","audio/music/love_me_do1.mp3","loveme");
+    so2B1 = AddSound("loveme2","audio/music/love_me_do2.mp3","loveme");
+    so2D1 = AddSound("loveme3","audio/music/love_me_do3.mp3","loveme");
+    //so2C2 = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme");
+    soBase = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme");
 
-    so2B1 = AddSound("glory1","audio/music/love_me_do_1.mp3","loveme");
-    so2A3 = AddSound("glory1","audio/music/love_me_do_2.mp3","loveme");
-    so2D1 = AddSound("glory1","audio/music/love_me_do_3.mp3","loveme");
-    so2C2 = AddSound("glory1","audio/music/love_me_do_4.mp3","loveme");
+    
 
     lvl2 = new Level(4,3);
     lvl2.AddRoom(1,1,[]);
@@ -444,7 +455,8 @@ function Initialize(){
     lvl2.AddRoom(4,1,[so2D1]);
     lvl2.AddRoom(1,2,[]);
     lvl2.AddRoom(2,2,[]);
-    lvl2.AddRoom(3,2,[so2C2]);
+    lvl2.AddRoom(3,2,[]);
+    // lvl2.AddRoom(3,2,[so2C2]);
     lvl2.AddRoom(4,2,[]);
     lvl2.AddRoom(1,3,[so2A3]);
     lvl2.AddRoom(2,3,[]);
@@ -466,8 +478,12 @@ function Initialize(){
     console.log(NPC.position);
     interf.ChangeMode("default");
     document.getElementById("posIndicator").innerHTML="You are in: "+NPC.position[0]+","+NPC.position[1];
-    NPC.Say("newPlace");
-    document.getElementById("game").style.display="block";
+    
+    document.getElementById("title").style.display="none";
+
+    NPC.Say("newPlace",document.getElementById("game").style.display="block");
+
+    
 }
 
 
