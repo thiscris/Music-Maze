@@ -1,7 +1,7 @@
 
 
 //Adding sound clips
-function AddSound(id, src, group) {
+function AddSound(id, src, group, _play, _loop) {
     this.sound = document.createElement("audio");
     this.sound.setAttribute("id",id);
     this.sound.src = src;
@@ -10,7 +10,6 @@ function AddSound(id, src, group) {
     this.sound.setAttribute("controls", "none");
     this.sound.style.display = "none";
     this.sound.volume = 0;
-    this.sound.loop = true;
     document.body.appendChild(this.sound);
     this.play = function(){
       this.sound.play();
@@ -20,7 +19,13 @@ function AddSound(id, src, group) {
     }
 
     //start playing immeadiately
-    this.play();
+    _play = _play || 0;
+    _play ? this.play() : 0;
+
+    //loop or not?
+    _loop = _loop || 0;
+    _loop ? this.sound.loop = true : 0;
+
 
     return sound;
   } 
@@ -172,6 +177,7 @@ class agent{
 
         followup = followup || console.log("no callback");
 
+        console.log(phrase);
         switch(phrase){
             case "OK, boss":
                 soSpeech.src = PickRandom(NPC.speech.Affirmations);
@@ -196,6 +202,7 @@ class agent{
 
             case "newPlace":
                 if(c==1 && r==1) {
+                    console.log(NPC.speech.hello);
                     soSpeech.src = PickRandom(NPC.speech.hello);
                     soSpeech.play(); 
                 }
@@ -363,12 +370,12 @@ class INTERFACE{
         this.btnLeft = document.getElementById("button-left");
         this.acceptInput = true;
 
-        document.addEventListener('keydown', logKey);
+        document.addEventListener('keydown', this.logKey);
     }
 
     logKey(k) {
-        console.log(e.code);
-        switch(e.code) {
+        console.log(k.code);
+        switch(k.code) {
             case "ArrowUP" || "Digit1":
                 this.ButtonPress("UP");
             break;
@@ -461,78 +468,96 @@ var NPC = new agent(startingPos,3);
 function Initialize(){
     interf = new INTERFACE;
 
-    soNotify = document.getElementById("notification");
-    soWalk = document.getElementById("walkSound");
-    soWalk.loop = true;
-    soSpeech = document.getElementById("Speech");
-/*
-    so1A1 = AddSound("glory1","audio/music/glory1.mp3","glory");
-    so1A2 = AddSound("glory2","audio/music/glory2.mp3","glory");
-    so1A3 = AddSound("glory3","audio/music/glory3.mp3","glory");
-    so1B1 = AddSound("popular1","audio/music/popular1.mp3","popular");
-    so1B2 = AddSound("popular2","audio/music/popular2.mp3","popular");
-    so1B3 = AddSound("popular3","audio/music/popular3.mp3","popular");
-    */
 
-   so1A1 = AddSound("glory1","audio/music/mds1.mp3","glory");
-   so1A2 = AddSound("glory2","audio/music/mds2.mp3","glory");
-   so1A3 = AddSound("glory3","audio/music/mds3.mp3","glory");
-   so1B1 = AddSound("popular1","audio/music/mds4.mp3","popular");
-   so1B2 = AddSound("popular2","audio/music/mds5.mp3","popular");
-   //so1B3 = AddSound("popular3","audio/music/popular3.mp3","popular");
+    soNotify = AddSound("notification","audio/sfx/235911_notification.wav","sfx");
+    soWalk = AddSound("walkSound","audio/sfx/steps.wav","sfx",0,1); //no_play, but loop
+    soSpeech = AddSound("Speech","","speech");
 
-    so1C1 = AddSound("shanghai1","audio/music/shanghai1.mp3","shanghai");
-    so1C2 = AddSound("shanghai2","audio/music/shanghai2.mp3","shanghai");
-
-
-
-    intro = new Level(3,1);
-
-
-    lvl1 = new Level(3,3);
-    lvl1.AddRoom(1,3,[so1A1]);
-    lvl1.AddRoom(2,3,[so1A2]);
-    lvl1.AddRoom(3,3,[so1A3]);
-    lvl1.AddRoom(1,2,[so1B1]);
-    lvl1.AddRoom(2,2,[so1B2]);
-    lvl1.AddRoom(3,2,[]);
-    // lvl1.AddRoom(3,2,[so1B3]);
-    lvl1.AddRoom(3,1,[so1C1]);
-    lvl1.AddRoom(2,1,[so1C2]);
-    lvl1.AddRoom(1,1,[]);
-
-    so2A3 = AddSound("loveme1","audio/music/love_me_do1.mp3","loveme");
-    so2B1 = AddSound("loveme2","audio/music/love_me_do2.mp3","loveme");
-    so2D1 = AddSound("loveme3","audio/music/love_me_do3.mp3","loveme");
-    //so2C2 = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme");
-    // soBase = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme");
-
-    
-
-    lvl2 = new Level(4,3);
-    lvl2.AddRoom(1,1,[]);
-    lvl2.AddRoom(2,1,[so2B1]);
-    lvl2.AddRoom(4,1,[so2D1]);
-    lvl2.AddRoom(1,2,[]);
-    lvl2.AddRoom(2,2,[]);
-    lvl2.AddRoom(3,2,[]);
-    // lvl2.AddRoom(3,2,[so2C2]);
-    lvl2.AddRoom(4,2,[]);
-    lvl2.AddRoom(1,3,[so2A3]);
-    lvl2.AddRoom(2,3,[]);
-    lvl2.AddRoom(4,3,[]);
 
 
     /*
         * Change level here
     */
+
+
+   intro = new Level(3,1);
+   lvl1 = new Level(3,3);
+   lvl2 = new Level(4,3);
+
    levels = [intro,lvl1,lvl2];
    var selected_lvl = getUrlParam('lvl','2');
    console.log(selected_lvl);
 
     current_lvl = levels[selected_lvl];
-
     // console.log(current_lvl.map);
+
+    if (current_lvl == intro) {
+
+    }
+
+    if (current_lvl == lvl1) {
+        so1A1 = AddSound("glory1","audio/music/glory1.mp3","glory",1,1);
+        so1A2 = AddSound("glory2","audio/music/glory2.mp3","glory",1,1);
+        so1A3 = AddSound("glory3","audio/music/glory3.mp3","glory",1,1);
+        so1B1 = AddSound("popular1","audio/music/popular1.mp3","popular",1,1);
+        so1B2 = AddSound("popular2","audio/music/popular2.mp3","popular",1,1);
+        so1B3 = AddSound("popular3","audio/music/popular3.mp3","popular",1,1);
+        so1C1 = AddSound("shanghai1","audio/music/shanghai1.mp3","shanghai",1,1);
+        so1C2 = AddSound("shanghai2","audio/music/shanghai2.mp3","shanghai",1,1);
+    
+        lvl1.AddRoom(1,3,[so1A1]);
+        lvl1.AddRoom(2,3,[so1A2]);
+        lvl1.AddRoom(3,3,[so1A3]);
+        lvl1.AddRoom(1,2,[so1B1]);
+        lvl1.AddRoom(2,2,[so1B2]);
+        lvl1.AddRoom(3,2,[]);
+        lvl1.AddRoom(3,2,[so1B3]);
+        lvl1.AddRoom(3,1,[so1C1]);
+        lvl1.AddRoom(2,1,[so1C2]);
+        lvl1.AddRoom(1,1,[]);
+    }
+
+    if (current_lvl == lvl2) {
+        //Mozilla
+        so2A3 = AddSound("mds1","audio/music/mds1.mp3","mds",1,1);
+        so2D2 = AddSound("mds2","audio/music/mds2.mp3","mds",1,1);
+        so2A1 = AddSound("mds3","audio/music/mds3.mp3","mds",1,1);
+        so2B2 = AddSound("mds4","audio/music/mds4.mp3","mds",1,1);
+        so2B3 = AddSound("mds5","audio/music/mds5.mp3","mds",1,1);
+        //Beatles
+        so2D3 = AddSound("loveme1","audio/music/love_me_do1.mp3","loveme",1,1);
+        so2B1 = AddSound("loveme2","audio/music/love_me_do2.mp3","loveme",1,1);
+        so2D1 = AddSound("loveme3","audio/music/love_me_do3.mp3","loveme",1,1);
+        so2C2 = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme",1,1);
+        so2A2 = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme",1,1);
+
+
+        lvl2.AddRoom(1,1,[so2A1]);
+        lvl2.AddRoom(2,1,[so2B1]);
+        lvl2.AddRoom(4,1,[so2D1]);
+        lvl2.AddRoom(1,2,[so2A2]);
+        lvl2.AddRoom(2,2,[so2B2]);
+        lvl2.AddRoom(3,2,[so2C2]);
+        lvl2.AddRoom(4,2,[so2D2]);
+        lvl2.AddRoom(1,3,[so2A3]);
+        lvl2.AddRoom(2,3,[so2B3]);
+        lvl2.AddRoom(4,3,[so2D3]);
+    }
+
+
+
+
+    
+
+
+
+
+    
+
+    
+
+
+
 
 
     // console.log(NPC.position);
