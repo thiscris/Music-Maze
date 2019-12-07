@@ -1,22 +1,28 @@
 
 
 //Adding sound clips
-function AddSound(id, src, group, _play, _loop) {
+function AddSound(id, src, group, _play, _loop, _volume) {
+    
     this.sound = document.createElement("audio");
     this.sound.setAttribute("id",id);
     this.sound.src = src;
     this.sound.class = group;
+    this.sound.setAttribute("class",group);
     this.sound.setAttribute("preload", "auto");
     this.sound.setAttribute("controls", "none");
     this.sound.style.display = "none";
-    this.sound.volume = 0;
     document.body.appendChild(this.sound);
     this.play = function(){
-      this.sound.play();
+        //this.sound.volume = 1;
+        this.sound.play();
     }
     this.stop = function(){
       this.sound.pause();
     }
+
+
+    _volume = _volume || 0;
+    this.sound.volume = _volume;
 
     //start playing immeadiately
     _play = _play || 0;
@@ -36,7 +42,8 @@ function AddSound(id, src, group, _play, _loop) {
 //Game has multiple levels
  class Level {
 
-    constructor(maxCols,maxRows) {
+    constructor(name,maxCols,maxRows) {
+        this.name = name;
         this.map = new Array();
         for (var i = 1; i<maxCols+1;i++){
             this.map[i] = new Array();
@@ -94,13 +101,13 @@ class Room {
         console.log(this.instruments);
         this.instruments.forEach(function(e){
             e.volume = 0.5;
-            console.log(e);
+            
         });
         // this.instruments.length > 0 ? soBase.volume = 0.3 : 0;
     }
 
     StopInstruments() {
-        console.log(NPC.position[0]+" "+NPC.position[1]);
+        console.log("stopping "+NPC.position[0]+" "+NPC.position[1]);
         this.instruments.forEach(function(e){
             e.volume = 0;
         });
@@ -147,6 +154,10 @@ class agent{
             "audio/speech/nothingHere1.mp3"
         ];
 
+        this.speech.new = {
+            "lvl2.21":"audio/speech/hello.mp3",
+        }
+
 
     }
 
@@ -171,12 +182,15 @@ class agent{
     }
 
     Say(phrase,followup) {
-        console.log(this);
+        
         var c = this.position[0];
         var r = this.position[1];
+        var lvl = current_lvl.name;
+        
 
         followup = followup || console.log("no callback");
 
+        
         console.log(phrase);
         switch(phrase){
             case "OK, boss":
@@ -201,14 +215,29 @@ class agent{
             break;
 
             case "newPlace":
-                if(c==1 && r==1) {
-                    console.log(NPC.speech.hello);
-                    soSpeech.src = PickRandom(NPC.speech.hello);
-                    soSpeech.play(); 
+                var place =lvl+"."+c+r;
+                console.log(place);
+                switch(place){
+                    case "lvl1.11":
+                        console.log(NPC.speech.hello);
+                        //soSpeech.src = PickRandom(NPC.speech.hello);
+                        soSpeech.src = soNotify.src;
+                        soSpeech.play(); 
+                    break;
+                    default:
+                        //console.log("say something if there is something to say");
+                        if(NPC.speech.new[place]!==undefined) {
+                            soSpeech.src = NPC.speech.new[place];
+                            console.log(NPC.speech.new[place]);
+                            soSpeech.play(); 
+                        }
+                    break;
                 }
+            break;
+
         }
         if(followup)  {
-            soSpeech.onended(followup());
+            soSpeech.onended = followup;
         }
         
     };
@@ -280,7 +309,8 @@ class agent{
         
     UpdateLocation(){
         console.log(this.facingDirection);
-        document.getElementById("posIndicator").innerHTML="You are in: "+this.position[0]+","+this.position[1];
+        console.log(current_lvl.name);
+        document.getElementById("posIndicator").innerHTML="You are in: "+current_lvl.name+" "+this.position[0]+","+this.position[1];
         
         this.Listen();
         if(!current_lvl.map[this.position[0],this.position[1]].visited) {
@@ -292,8 +322,9 @@ class agent{
     }
 
     Listen() {
-        //console.log(current_lvl.map);
-        current_lvl.map[this.position[0]][this.position[1]].PlayInstruments();
+        console.log(current_lvl.map);
+        // console.log(this);
+        current_lvl.map[NPC.position[0]][NPC.position[1]].PlayInstruments();
     }
 
     PickInstrument(ins){
@@ -301,6 +332,7 @@ class agent{
         console.log(this.heldInstrument);
         if (this.heldInstrument) {
             console.log("already holding something");
+            this.ActionDone();
             return;
         }
 
@@ -324,23 +356,28 @@ class agent{
     DropInstrument(){
 
         console.log(NPC.heldInstrument);
-        if(NPC.heldInstrument === null) return;
+        if(NPC.heldInstrument === null) {
+            this.ActionDone();
+            return;
+        }
 
         var instr_group = NPC.heldInstrument.class;
         
         this.heldInstrument.volume = 0.5;
         current_lvl.map[this.position[0]][this.position[1]].instruments.push(this.heldInstrument);
-        this.heldInstrument = "";
+        this.heldInstrument =null;
         
         //check if all instruments of one group are together
-        console.log(instr_group);
+        
+
+        //how many are there of this group
+        var thisclass_total = document.getElementsByClassName(instr_group).length
+
         var instr_group_count =0;
         current_lvl.map[this.position[0]][this.position[1]].instruments.forEach (function(e){
             e.class == instr_group ? instr_group_count++ : 0;
-            console.log(e.class);
-            console.log(instr_group_count);
         });
-        instr_group_count==4 ? NPC.Say("Victory",NPC.Victory()) : 0; //Fixed to 3 instruments
+        instr_group_count==thisclass_total ? NPC.Say("Victory",NPC.Victory()) : 0; //Fixed to 3 instruments
 
         this.ActionDone();
 
@@ -355,6 +392,22 @@ class agent{
 
     Victory() {
         //something awesome
+
+        //remove old sounds
+        current_lvl.map[this.position[0]][this.position[1]].StopInstruments();
+
+
+        //update starting position
+        NPC.position[0] = 1;
+        NPC.position[1] = 2;
+
+        //like going to a new level
+        current_lvl = LoadLevel("2");
+
+        //say something in the new level and start listening to it
+        NPC.Say("newPlace",NPC.Listen);
+        
+        
 
     }
     
@@ -376,17 +429,22 @@ class INTERFACE{
     logKey(k) {
         console.log(k.code);
         switch(k.code) {
-            case "ArrowUP" || "Digit1":
-                this.ButtonPress("UP");
+            case "ArrowUp":
+            case "Digit1":
+                console.log(1);
+                interf.ButtonPress("UP");
             break;
-            case "ArrowDOWN" || "Digit4":
-                this.ButtonPress("DOWN");
+            case "ArrowDown":
+            case "Digit4":
+                interf.ButtonPress("DOWN");
             break;
-            case "ArrowRIGHT" || "Digit3":
-                this.ButtonPress("RIGHT");
+            case "ArrowRight":
+            case "Digit3":
+                interf.ButtonPress("RIGHT");
             break;
-            case "ArrowLEFT" || "Digit2":
-                this.ButtonPress("LEFT");
+            case "ArrowLeft":
+            case "Digit2":
+                interf.ButtonPress("LEFT");
             break;
         }
     }
@@ -394,7 +452,7 @@ class INTERFACE{
     ButtonPress(btn){
         if(!this.acceptInput) return;
 
-        console.log(interf.interfacemode);
+        //console.log(interf.interfacemode);
         if(interf.interfacemode=="move"){
             switch(btn) {
                 case "UP":
@@ -464,38 +522,32 @@ var startingPos = [1,1];
 var NPC = new agent(startingPos,3);
 
 
-//INITIALIZE
-function Initialize(){
-    interf = new INTERFACE;
+
+function LoadLevel(level_name) {
+
+    //forget current level if any
+    current_lvl = null;
+    //forget non-sfx sounds
+    var all_sounds = document.getElementsByTagName("audio");
+    for (s = 0; s<all_sounds.length;s++) {
+        if (all_sounds[s].class != "sfx"){
+            console.log(all_sounds[s]);
+            all_sounds[s].parentNode.removeChild(all_sounds[s]);
+        };
+        
+    }
 
 
-    soNotify = AddSound("notification","audio/sfx/235911_notification.wav","sfx");
-    soWalk = AddSound("walkSound","audio/sfx/steps.wav","sfx",0,1); //no_play, but loop
-    soSpeech = AddSound("Speech","","speech");
+    //start new level
+    var level = levels[level_name];
+    console.log(level);
 
 
-
-    /*
-        * Change level here
-    */
-
-
-   intro = new Level(3,1);
-   lvl1 = new Level(3,3);
-   lvl2 = new Level(4,3);
-
-   levels = [intro,lvl1,lvl2];
-   var selected_lvl = getUrlParam('lvl','2');
-   console.log(selected_lvl);
-
-    current_lvl = levels[selected_lvl];
-    // console.log(current_lvl.map);
-
-    if (current_lvl == intro) {
+    if (level == intro) {
 
     }
 
-    if (current_lvl == lvl1) {
+    if (level == lvl1) {
         so1A1 = AddSound("glory1","audio/music/glory1.mp3","glory",1,1);
         so1A2 = AddSound("glory2","audio/music/glory2.mp3","glory",1,1);
         so1A3 = AddSound("glory3","audio/music/glory3.mp3","glory",1,1);
@@ -517,7 +569,7 @@ function Initialize(){
         lvl1.AddRoom(1,1,[]);
     }
 
-    if (current_lvl == lvl2) {
+    if (level == lvl2) {
         //Mozilla
         so2A3 = AddSound("mds1","audio/music/mds1.mp3","mds",1,1);
         so2D2 = AddSound("mds2","audio/music/mds2.mp3","mds",1,1);
@@ -544,40 +596,52 @@ function Initialize(){
         lvl2.AddRoom(4,3,[so2D3]);
     }
 
+    interf.ChangeMode("default");
+    document.getElementById("posIndicator").innerHTML="You are in: "+level.name+" "+NPC.position[0]+","+NPC.position[1];
+    return level;
+}
+
+//INITIALIZE
+function Initialize(start_level){
+    interf = new INTERFACE;
+
+
+    soNotify = AddSound("notification","audio/sfx/235911_notification.wav","sfx",0,0,1);
+    soWalk = AddSound("walkSound","audio/sfx/steps.wav","sfx",0,1,1); //no_play, but loop
+    soSpeech = AddSound("Speech","","sfx",0,0,1);
 
 
 
+    /*
+        * Change level here
+    */
+   intro = new Level('intro',3,1);
+   lvl1 = new Level('lvl1',3,3);
+   lvl2 = new Level('lvl2',4,3);
+
+   levels = [intro,lvl1,lvl2];
+
+   //use the function parameter level, the one from the url, or the default
+   default_level = "1";
+   var selected_lvl = start_level || getUrlParam('lvl',default_level);
+   console.log(selected_lvl);
+
+   current_lvl = LoadLevel(selected_lvl);
     
-
-
-
-
-    
-
-    
-
-
+    //console.log(current_lvl.map);
 
 
 
     // console.log(NPC.position);
-    interf.ChangeMode("default");
-    document.getElementById("posIndicator").innerHTML="You are in: "+NPC.position[0]+","+NPC.position[1];
     
     document.getElementById("title").style.display="none";
 
     Haptics.vibrate(100);
 
-    NPC.Say("newPlace",document.getElementById("game").style.display="block");
-
+    NPC.Say("newPlace",function() {document.getElementById("game").style.display="block"});
+   
     
 }
-
-
-
-
-
-
 
 
 
