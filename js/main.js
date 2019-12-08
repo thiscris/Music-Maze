@@ -181,6 +181,14 @@ class agent{
             "audio/speech/nothingHere1.mp3"
         ];
 
+        this.speech.emptyHands = [
+            "audio/speech/dropEmpty.mp3"
+        ];
+
+        this.speech.pickupFull = [
+            "audio/speech/pickupFull.mp3"
+        ];
+
         //Object
         this.speech.new = {
             "lvl0.14":"audio/speech/hello.mp3",
@@ -193,7 +201,6 @@ class agent{
 
         }
 
-        //String
         this.speech.complete = {
             "lvl0":"audio/speech/lvl0-complete.mp3",
             "lvl1":"audio/speech/lvl1-complete.mp3",
@@ -252,7 +259,7 @@ class agent{
             break;
 
             case "emptyHands":
-                soSpeech.src = PickRandom(NPC.speech.empty);
+                soSpeech.src = PickRandom(NPC.speech.emptyHands);
                 soSpeech.play(); 
             break;
 
@@ -366,11 +373,11 @@ class agent{
         this.Listen();
         if(!current_lvl.map[NPC.position[0]][NPC.position[1]].visited) {
             sound = NPC.Say("newPlace");
+            current_lvl.map[this.position[0]][this.position[1]].visited=true;
             sound.onended = this.ActionDone();
         } else { 
             this.ActionDone(); }
 
-        current_lvl.map[this.position[0]][this.position[1]].visited=true;
     }
 
     Listen() {
@@ -392,7 +399,8 @@ class agent{
             console.log(this.heldInstrument);
             if (this.heldInstrument) { 
                 console.log("already holding something");
-                this.ActionDone();
+                NPC.Say("pickupFull")
+                soSpeech.onended = this.ActionDone();
                 return;
             }
             this.heldInstrument =a;
@@ -413,6 +421,7 @@ class agent{
 
         console.log(NPC.heldInstrument);
         if(NPC.heldInstrument === null) {
+            NPC.Say("emptyHands");
             this.ActionDone();
             return;
         }
@@ -461,12 +470,12 @@ class agent{
 
 
         if(group == "glory") {
-            //sound = NPC.Say("CompleteLvl");
+            sound = NPC.Say("CompleteLvl");
             sound.onended = function() { SwitchToLevel(2) };
         }
 
         if(group == "popular") {
-            //sound = NPC.Say("CompleteLvl");
+            sound = NPC.Say("CompleteLvl");
             sound.onended = function() { SwitchToLevel(3) };
         }
 
@@ -521,39 +530,54 @@ class INTERFACE{
         if(interf.interfacemode=="move"){
             switch(btn) {
                 case "UP":
-                    NPC.ToldTo('Move',0);
+                    soVox.src = "audio/sfx/voxGoForward.mp3";
+                    var dir = 0;
                 break;
                 case "DOWN":
-                    NPC.ToldTo('Move',6);
+                    soVox.src = "audio/sfx/voxGoBack.mp3";
+                    var dir = 6;
                 break;
                 case "RIGHT":
-                    NPC.ToldTo('Move',3);
+                    soVox.src = "audio/sfx/voxGoRight.mp3";
+                    var dir = 3;
                 break;
                 case "LEFT":
-                    NPC.ToldTo('Move',-3);
+                    soVox.src = "audio/sfx/voxGoLeft.mp3";
+                    var dir = -3;
                 break;
             }
+            soVox.play();
+            soVox.onended = function(){ NPC.ToldTo('Move',dir)};
             
             
         }
         if (interf.interfacemode=="default"){
             switch(btn) {
                 case "UP":
-                    //alertme();
-                    interf.ChangeMode('move');
+                    soVox.src = "audio/sfx/voxMove.mp3";
+                    soVox.play();
+                    soVox.onended = function(){ interf.ChangeMode('move')};
                 break;
+
                 case "DOWN":
                     return;
                 break;
+
                 case "RIGHT":
-                    NPC.ToldTo('DropInstrument');
+                    soVox.src = "audio/sfx/voxDropDown.mp3";
+                    soVox.play();
+                    soVox.onended = function(){  NPC.ToldTo('DropInstrument');};
+                
                 break;
                 case "LEFT":
-                    NPC.ToldTo('PickInstrument');
+                    soVox.src = "audio/sfx/voxPickUp.mp3";
+                    soVox.play();
+                    soVox.onended = function(){  NPC.ToldTo('PickInstrument');};
+                    
                 break;
             }
         }
-        soBleep.play();//sound feedback
+        //soBleep.play();//sound feedback
         Haptics.vibrate(40); //vibration feedback 
     }
     
@@ -709,6 +733,7 @@ function Initialize(start_level){
     soBleep = AddSound("bleep","audio/sfx/MenuSound.wav","sfx",0,0,1);
     soWalk = AddSound("walkSound","audio/sfx/steps.mp3","sfx",0,1,1); //no_play, but loop
     soSpeech = AddSound("Speech","","sfx",0,0,1);
+    soVox = AddSound("vox","","sfx",0,0,1);//interface reader
 
 
 
@@ -728,7 +753,7 @@ function Initialize(start_level){
    console.log(selected_lvl);
 
    current_lvl = LoadLevel(selected_lvl);
-   NPC.Listen();
+   NPC.UpdateLocation();
     
     //console.log(current_lvl.map);
 
@@ -749,8 +774,7 @@ function Initialize(start_level){
 function SwitchToLevel(id){
     current_lvl.map[NPC.position[0]][NPC.position[1]].StopInstruments();
     current_lvl = LoadLevel(id);
-    NPC.Listen();
-    interf.acceptInput = true;
+    NPC.UpdateLocation();
 };
 
 
