@@ -11,14 +11,37 @@
         
         <span id="posIndicator">You are in:</span>
 
+        <div id="instructions" onclick="initKeys()">
+This audio game is intended for play without visual feedback.</br>
+</br>
+Try creating a map of each level in your mind.</br>
+Help your partner to gather all outputs that belong to the same melody.</br>
+</br>
+The game uses a total of 4 buttons. </br>
+The main 3 buttons are: "Move", "Pick" and "Drop".</br>
+The "Move" choice gives 4 options: </br>
+"Go forward";</br>
+"Go left";</br>
+"Go right";</br>
+"Go back";</br>
+</br>
+There are 3 input methods:</br>
+The first is by using the arrow keys on the keyboard.</br>
+The second is by clicking on the top, bottom left or right side of the screen.</br>
+The third input method uses the numbers on the keyboard from 1 to 4.</br>
+</br>
+Press anything to start.
+        </div>
+
+
+        <audio id="soInstructions" src="audio/speech/instructions.mp3"></audio>
+        <audio id="incomingCall" src="audio/sfx/music-maze-incoming-call.mp3"></audio>
+
         <div id="title" onClick="Initialize()">
             <div>Incoming call</div>
             <div>Music Maze</div>
         </div>
         <div id="game">
-            <!-- <audio id="notification2" src="audio/sfx/235911_notification.wav"></audio>
-            <audio id="walkSound" src="audio/sfx/steps.wav"></audio>
-            <audio id="Speech" ></audio> -->
  
             
 

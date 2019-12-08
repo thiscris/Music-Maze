@@ -1,3 +1,23 @@
+document.addEventListener('keydown', initKeys);
+var presses = 0;
+
+function initKeys(k){
+    if(document.getElementById("instructions")){
+        presses++;
+        if(presses == 1) { document.getElementById("soInstructions").play(); }
+        if(presses >= 2) { 
+            document.getElementById("instructions").remove(); 
+            document.getElementById("soInstructions").pause();
+            document.getElementById("incomingCall").play();
+        }
+        return;
+    }
+    if(document.getElementById("title")){
+        document.getElementById("title").remove(); 
+    }
+}
+
+
 
 
 //Adding sound clips
@@ -242,24 +262,14 @@ class agent{
 
             case "newPlace":
                 console.log(place);
-                switch(place){
-                    case "lvl1.11":
-                        console.log(NPC.speech.hello);
-                        //soSpeech.src = PickRandom(NPC.speech.hello);
-                        soSpeech.src = soNotify.src;
-                        soSpeech.play(); 
-                    break;
-                    default:
-                        //console.log("say something if there is something to say");
 
-                        console.log(NPC.speech.new[place]);
-                        if(NPC.speech.new[place]!==undefined) {
-                            console.log(NPC.speech.new[place]);
-                            soSpeech.src = NPC.speech.new[place];
-                            soSpeech.play(); 
-                        }
-                    break;
+                console.log(NPC.speech.new[place]);
+                if(NPC.speech.new[place]!==undefined) {
+                    // console.log(NPC.speech.new[place]);
+                    soSpeech.src = NPC.speech.new[place];
+                    soSpeech.play(); 
                 }
+
             break;
 
         }
@@ -441,12 +451,12 @@ class agent{
 
 
         if(group == "glory") {
-            sound = NPC.Say("CompleteLvl");
+            //sound = NPC.Say("CompleteLvl");
             sound.onended = function() { SwitchToLevel(2) };
         }
 
         if(group == "popular") {
-            sound = NPC.Say("CompleteLvl");
+            //sound = NPC.Say("CompleteLvl");
             sound.onended = function() { SwitchToLevel(3) };
         }
 
