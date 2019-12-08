@@ -100,7 +100,7 @@ class Room {
     PlayInstruments() {
         console.log(this.instruments);
         this.instruments.forEach(function(e){
-            e.volume = 0.5;
+            e.volume = 0.2;
             
         });
         // this.instruments.length > 0 ? soBase.volume = 0.3 : 0;
@@ -146,9 +146,6 @@ class agent{
             "audio/speech/hello.mp3"
         ];
 
-        this.speech.victory = [
-            "audio/speech/victory.mp3"
-        ];
 
         this.speech.empty = [
             "audio/speech/nothingHere1.mp3"
@@ -156,12 +153,23 @@ class agent{
 
         //Object
         this.speech.new = {
-            "lvl2.21":"audio/speech/hello.mp3",
+            "lvl0.14":"audio/speech/hello.mp3",
+            "lvl0.13":"audio/speech/0A3-1.mp3",
+            "lvl0.12":"audio/speech/0A2-1.mp3",
+            "lvl0.11":"audio/speech/0A1-1.mp3",
+            "lvl1.11":"audio/speech/1B1-1.mp3",
+            "lvl1.21":"audio/speech/1C1-1.mp3",
+            "lvl1.31":"audio/speech/1D1-1.mp3",
+
         }
 
         //String
-        this.speech.GotoLVL1 = "audio/speech/gotoLVL1.mp3";
-
+        this.speech.complete = {
+            "lvl0":"audio/speech/lvl0-complete.mp3",
+            "lvl1":"audio/speech/lvl1-complete.mp3",
+            "lvl2":"audio/speech/lvl2-complete.mp3",
+            "lvl3":"audio/speech/victory.mp3",            
+        }
 
     }
 
@@ -190,6 +198,7 @@ class agent{
         var c = this.position[0];
         var r = this.position[1];
         var lvl = current_lvl.name;
+        var place =lvl+"."+c+r;
         
 
         followup = followup || console.log("no callback");
@@ -223,21 +232,15 @@ class agent{
                 soSpeech.play(); 
             break;
 
-            case "GoLvl1":
-                    soSpeech.src = soNotify.src;
+            case "CompleteLvl":
+                if(NPC.speech.complete[lvl]!==undefined) {
+                    console.log(NPC.speech.complete[lvl]);
+                    soSpeech.src = NPC.speech.complete[lvl];
                     soSpeech.play(); 
-            break;
-            case "GoLvl2":
-                    soSpeech.src = soNotify.src;
-                    soSpeech.play(); 
-            break;
-            case "GoLvl3":
-                    soSpeech.src = soNotify.src;
-                    soSpeech.play(); 
+                } 
             break;
 
             case "newPlace":
-                var place =lvl+"."+c+r;
                 console.log(place);
                 switch(place){
                     case "lvl1.11":
@@ -248,9 +251,11 @@ class agent{
                     break;
                     default:
                         //console.log("say something if there is something to say");
+
+                        console.log(NPC.speech.new[place]);
                         if(NPC.speech.new[place]!==undefined) {
-                            soSpeech.src = NPC.speech.new[place];
                             console.log(NPC.speech.new[place]);
+                            soSpeech.src = NPC.speech.new[place];
                             soSpeech.play(); 
                         }
                     break;
@@ -261,6 +266,8 @@ class agent{
         if(followup)  {
             soSpeech.onended = followup(arg);
         }
+
+        return soSpeech;
         
     };
 
@@ -306,7 +313,8 @@ class agent{
         var moved = false;
         //if tile is not on the map report that
         if(current_lvl.map[newC]==undefined || current_lvl.map[newC][newR]===undefined){
-            NPC.Say("Can't go",NPC.ActionDone());
+            sound = NPC.Say("Can't go");
+            sound.onended = NPC.ActionDone();
             interf.acceptInput = true;
             return;
         } 
@@ -317,7 +325,8 @@ class agent{
         this.position[0]=newC;
         this.position[1]=newR;
         this.facingDirection = newDirection;
-        NPC.Say("OK, boss",NPC.Walk());
+        sound = NPC.Say("OK, boss");
+        sound.onended = NPC.Walk();
   
     }     
         
@@ -336,7 +345,8 @@ class agent{
         
         this.Listen();
         if(!current_lvl.map[NPC.position[0]][NPC.position[1]].visited) {
-            NPC.Say("newPlace",this.ActionDone());
+            sound = NPC.Say("newPlace");
+            sound.onended = this.ActionDone();
         } else { 
             this.ActionDone(); }
 
@@ -351,29 +361,32 @@ class agent{
 
     PickInstrument(ins){
 
-        console.log(this.heldInstrument);
-        if (this.heldInstrument) {
-            console.log("already holding something");
-            this.ActionDone();
-            return;
-        }
 
         var a = current_lvl.map[this.position[0]][this.position[1]].instruments[ins];
         console.log(a);
 
+
+        //room is not empty
         if( a !== undefined) {
+
+            console.log(this.heldInstrument);
+            if (this.heldInstrument) { 
+                console.log("already holding something");
+                this.ActionDone();
+                return;
+            }
             this.heldInstrument =a;
-            this.heldInstrument.volume = 1;
-            NPC.Say("OK, boss");
+            this.heldInstrument.volume = 0.4;
+            sound = NPC.Say("OK, boss");
             // soBase.volume = 0.45
         } else {
             console.log("empty");
-            NPC.Say("empty");
+            sound = NPC.Say("empty");
         }
 
         current_lvl.map[this.position[0]][this.position[1]].instruments.splice(ins,1);
 
-        this.ActionDone();
+        sound.onended = this.ActionDone();
     }
 
     DropInstrument(){
@@ -386,10 +399,10 @@ class agent{
 
         var instr_group = NPC.heldInstrument.class;
         
-        this.heldInstrument.volume = 0.5;
+        this.heldInstrument.volume = 0.2;
         current_lvl.map[this.position[0]][this.position[1]].instruments.push(this.heldInstrument);
         this.heldInstrument =null;
-        NPC.Say("OK, boss");
+        sound = NPC.Say("OK, boss");
         
         //check if all instruments of one group are together
         
@@ -401,7 +414,9 @@ class agent{
         current_lvl.map[this.position[0]][this.position[1]].instruments.forEach (function(e){
             e.class == instr_group ? instr_group_count++ : 0;
         });
-        instr_group_count==thisclass_total ? NPC.Victory(instr_group) : 0;
+        sound.onended = function() {
+            instr_group_count==thisclass_total ? NPC.Victory(instr_group) : 0;
+        };
 
         this.ActionDone();
 
@@ -417,45 +432,28 @@ class agent{
     Victory(group) {
         //something awesome
         console.log("sorted "+group);
+        interf.acceptInput = false;
 
         if(group == "shanghai") {
-            //say something and stop sounds
-            current_lvl.map[NPC.position[0]][NPC.position[1]].StopInstruments();
-           // NPC.Say("empty",function(){current_lvl = LoadLevel("1")});
-            
-            current_lvl = LoadLevel("1");
+           sound = NPC.Say("CompleteLvl");
+           sound.onended = function() { SwitchToLevel(1) };
         }
 
 
         if(group == "glory") {
-            //say something and stop sounds
-           // NPC.Say("GoLvl2");
-            current_lvl.map[NPC.position[0]][NPC.position[1]].StopInstruments();
-            current_lvl = LoadLevel("2");
+            sound = NPC.Say("CompleteLvl");
+            sound.onended = function() { SwitchToLevel(2) };
         }
 
         if(group == "popular") {
-            //say something and stop sounds
-            //NPC.Say("GoLvl3");
-            current_lvl.map[NPC.position[0]][NPC.position[1]].StopInstruments();
-            current_lvl = LoadLevel("3");
+            sound = NPC.Say("CompleteLvl");
+            sound.onended = function() { SwitchToLevel(3) };
         }
 
 
-        if(group == "mds") {
-            //say something and stop sounds
-            NPC.Say("Victory");
-            //current_lvl = LoadLevel("1");
+        if(group == "mdn") {
+            sound = NPC.Say("CompleteLvl");
         }
-
-        
-
-        //like going to a new level
-
-        //say something in the new level and start listening to it
-        //NPC.Say("newPlace",NPC.Listen);
-        
-        
 
     }
     
@@ -500,7 +498,6 @@ class INTERFACE{
     ButtonPress(btn){
         if(!this.acceptInput) return;
 
-        //console.log(interf.interfacemode);
         if(interf.interfacemode=="move"){
             switch(btn) {
                 case "UP":
@@ -516,7 +513,7 @@ class INTERFACE{
                     NPC.ToldTo('Move',-3);
                 break;
             }
-            Haptics.vibrate(40); //vibration feedback 
+            
             
         }
         if (interf.interfacemode=="default"){
@@ -524,21 +521,20 @@ class INTERFACE{
                 case "UP":
                     //alertme();
                     interf.ChangeMode('move');
-                    Haptics.vibrate(40); //vibration feedback
                 break;
                 case "DOWN":
-                    
+                    return;
                 break;
                 case "RIGHT":
                     NPC.ToldTo('DropInstrument');
-                    Haptics.vibrate(40); //vibration feedback
                 break;
                 case "LEFT":
                     NPC.ToldTo('PickInstrument');
-                    Haptics.vibrate(40); //vibration feedback
                 break;
             }
         }
+        soBleep.play();//sound feedback
+        Haptics.vibrate(40); //vibration feedback 
     }
     
     ChangeMode(newMode) {
@@ -586,11 +582,11 @@ function LoadLevel(level_name) {
     }
 
 
-    //start new level
+    //retrieve new level name
     var level = levels[level_name];
     console.log(level);
 
-
+    //load level sounds
     if (level == lvl0) {
 
         so0A1 = AddSound("shanghai1","audio/music/shanghai1.mp3","shanghai",1,1);
@@ -601,15 +597,14 @@ function LoadLevel(level_name) {
         // lvl0.AddRoom(1,3,[so0A3]);
         // lvl0.AddRoom(1,4,[]);
 
-        lvl0.AddRoom(1,1,[]);
+        lvl0.AddRoom(1,1,[so0A1]);
         lvl0.AddRoom(1,2,[]);
         lvl0.AddRoom(1,3,[so0A3]);
-        lvl0.AddRoom(1,4,[so0A1]);
+        lvl0.AddRoom(1,4,[]);
 
         var start_c = 1;
         var start_r = 4;
         var start_direction = 0;
-        //level = lvl0;
     }
 
     if (level == lvl1) {
@@ -628,16 +623,16 @@ function LoadLevel(level_name) {
     }
 
     if (level == lvl2) {
-        so2A1 = AddSound("popular1","audio/music/popular1.mp3","popular",1,1);
-        so2B2 = AddSound("popular2","audio/music/popular2.mp3","popular",1,1);
-        so2A3 = AddSound("popular3","audio/music/popular3.mp3","popular",1,1);
+        so2B1 = AddSound("popular1","audio/music/popular1.mp3","popular",1,1);
+        so2A2 = AddSound("popular2","audio/music/popular2.mp3","popular",1,1);
+        so2B3 = AddSound("popular3","audio/music/popular3.mp3","popular",1,1);
     
-        lvl2.AddRoom(1,1,[so2A1]);
-        lvl2.AddRoom(1,2,[]);
-        lvl2.AddRoom(1,3,[so2A3]);
-        lvl2.AddRoom(2,1,[]);
-        lvl2.AddRoom(2,2,[so2B2]);
-        lvl2.AddRoom(2,3,[]);
+        lvl2.AddRoom(1,1,[]);
+        lvl2.AddRoom(1,2,[so2B1]);
+        lvl2.AddRoom(1,3,[]);
+        lvl2.AddRoom(2,1,[so2B3]);
+        lvl2.AddRoom(2,2,[]);
+        lvl2.AddRoom(2,3,[so2A2]);
 
         var start_c = 1;
         var start_r = 1;
@@ -646,23 +641,22 @@ function LoadLevel(level_name) {
 
     if (level == lvl3) {
         //Mozilla
-        so3A3 = AddSound("mds1","audio/music/mds1.mp3","mds",1,1);
-        so3D2 = AddSound("mds2","audio/music/mds2.mp3","mds",1,1);
-        so3A1 = AddSound("mds3","audio/music/mds3.mp3","mds",1,1);
-        so3B2 = AddSound("mds4","audio/music/mds4.mp3","mds",1,1);
-        so3B3 = AddSound("mds5","audio/music/mds5.mp3","mds",1,1);
+        so3A3 = AddSound("mdn1","audio/music/mdn1.mp3","mdn",1,1);
+        so3D2 = AddSound("mdn2","audio/music/mdn2.mp3","mdn",1,1);
+        so3A1 = AddSound("mdn3","audio/music/mdn3.mp3","mdn",1,1);
+        so3B2 = AddSound("mdn4","audio/music/mdn4.mp3","mdn",1,1);
+        so3B3 = AddSound("mdn5","audio/music/mdn5.mp3","mdn",1,1);
         //Beatles
         so3D3 = AddSound("loveme1","audio/music/love_me_do1.mp3","loveme",1,1);
         so3B1 = AddSound("loveme2","audio/music/love_me_do2.mp3","loveme",1,1);
         so3D1 = AddSound("loveme3","audio/music/love_me_do3.mp3","loveme",1,1);
         so3C2 = AddSound("loveme4","audio/music/love_me_do4.mp3","loveme",1,1);
-        so3A2 = AddSound("loveme5","audio/music/love_me_do5.mp3","loveme",1,1);
 
 
-        lvl3.AddRoom(1,1,[so3A1]);
+        lvl3.AddRoom(1,1,[]);
         lvl3.AddRoom(2,1,[so3B1]);
         lvl3.AddRoom(4,1,[so3D1]);
-        lvl3.AddRoom(1,2,[so3A2]);
+        lvl3.AddRoom(1,2,[so3A1]);
         lvl3.AddRoom(2,2,[so3B2]);
         lvl3.AddRoom(3,2,[so3C2]);
         lvl3.AddRoom(4,2,[so3D2]);
@@ -679,6 +673,7 @@ function LoadLevel(level_name) {
     NPC.position[0] = start_c;
     NPC.position[1] = start_r;
     NPC.facingDirection = start_direction;
+    
 
     interf.ChangeMode("default");
     document.getElementById("posIndicator").innerHTML="You are in: "+level.name+" "+NPC.position[0]+","+NPC.position[1];
@@ -691,7 +686,8 @@ function Initialize(start_level){
 
 
     soNotify = AddSound("notification","audio/sfx/235911_notification.wav","sfx",0,0,1);
-    soWalk = AddSound("walkSound","audio/sfx/steps.wav","sfx",0,1,1); //no_play, but loop
+    soBleep = AddSound("bleep","audio/sfx/MenuSound.wav","sfx",0,0,1);
+    soWalk = AddSound("walkSound","audio/sfx/steps.mp3","sfx",0,1,1); //no_play, but loop
     soSpeech = AddSound("Speech","","sfx",0,0,1);
 
 
@@ -712,6 +708,7 @@ function Initialize(start_level){
    console.log(selected_lvl);
 
    current_lvl = LoadLevel(selected_lvl);
+   NPC.Listen();
     
     //console.log(current_lvl.map);
 
@@ -723,10 +720,18 @@ function Initialize(start_level){
 
     Haptics.vibrate(100);
 
-    NPC.Say("newPlace",function() {document.getElementById("game").style.display="block"});
+    sound = NPC.Say("newPlace");
+    sound.onended = function() {document.getElementById("game").style.display="block"};
    
     
 }
+
+function SwitchToLevel(id){
+    current_lvl.map[NPC.position[0]][NPC.position[1]].StopInstruments();
+    current_lvl = LoadLevel(id);
+    NPC.Listen();
+    interf.acceptInput = true;
+};
 
 
 
