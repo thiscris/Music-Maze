@@ -1,10 +1,20 @@
 document.addEventListener('keydown', initKeys);
 var presses = 0;
+var clicks = 0;
+
+function clickToHear(){
+    if(clicks == 0) { document.getElementById("soInstructions").play(); }
+    clicks++;
+    if(clicks >= 2) {
+        document.getElementById("instructions").remove(); 
+        document.getElementById("soInstructions").pause();
+        document.getElementById("incomingCall").play();
+    }
+}
 
 function initKeys(k){
     if(document.getElementById("instructions")){
         presses++;
-        if(presses == 1) { document.getElementById("soInstructions").play(); }
         if(presses >= 2) { 
             document.getElementById("instructions").remove(); 
             document.getElementById("soInstructions").pause();
@@ -13,7 +23,7 @@ function initKeys(k){
         return;
     }
     if(document.getElementById("title")){
-        document.getElementById("title").remove(); 
+        Initialize(); 
     }
 }
 
@@ -726,7 +736,7 @@ function Initialize(start_level){
 
     // console.log(NPC.position);
     
-    document.getElementById("title").style.display="none";
+    document.getElementById("title").remove();
 
     Haptics.vibrate(100);
 
